@@ -7,14 +7,24 @@ const ccLogo = document.querySelector(".cc-logo span:nth-child(2) img")
 
 function setCardType(type) {
   const colors = {
-    visa: ["#436d99", "#2d57f2"],
-    mastercard: ["#df6f29", "#c69347"],
     default: ["black", "gray"],
+    visa: ["#436d99", "#2d57f2"],
+    mastercard: ["#eb001b", "#f79e1b"],
+    amex: ["#0077a6", "#ffffff"],
+    discover: ["#db8135", "#ffffff"],
+    diners: ["#0079be", "#ffffff"],
+    jcb15: ["#1f286f", "#007940"],
+    jcb: ["#1f286f", "#007940"],
+    maestro: ["#eb001b", "#0099df"],
+    unionpay: ["#dd0228", "#01798a"],
   }
 
   ccBgColor01.setAttribute("fill", colors[type][0])
   ccBgColor02.setAttribute("fill", colors[type][1])
-  ccLogo.setAttribute("src", `cc-${type}.svg`)
+  ccLogo.setAttribute(
+    "src",
+    type.includes("jcb") ? `cc-jcb.svg` : `cc-${type}.svg`
+  )
 }
 
 globalThis.setCardType = setCardType
@@ -53,8 +63,43 @@ const cardNumberPattern = {
     },
     {
       mask: "0000 0000 0000 0000",
-      regex: /(^5[1-5]\d{0,2}|^22[2-9]\d|^2[3-7]\d{0,2})\d{0,12}/,
+      regex: /(^5[1-5]\d{0,2}|^22[2-9]\d{0,1}|^2[3-7]\d{0,2})\d{0,12}/,
       cardType: "mastercard",
+    },
+    {
+      mask: "0000 000000 00000",
+      regex: /^3[47]\d{0,13}/,
+      cardType: "amex",
+    },
+    {
+      mask: "0000 0000 0000 0000",
+      regex: /^6(?:011|5\d{0,2}|4[4-9]\d?)\d{0,12}/,
+      cardType: "discover",
+    },
+    {
+      mask: "0000 000000 0000",
+      regex: /^3(?:0([0-5]|9)|[689]\d?)\d{0,11}/,
+      cardType: "diners",
+    },
+    {
+      mask: "0000 000000 00000",
+      regex: /^(?:2131|1800)\d{0,11}/,
+      cardType: "jcb15",
+    },
+    {
+      mask: "0000 0000 0000 0000",
+      regex: /^(?:35\d{0,2})\d{0,12}/,
+      cardType: "jcb",
+    },
+    {
+      mask: "0000 0000 0000 0000",
+      regex: /^(?:5[0678]\d{0,2}|6304|67\d{0,2})\d{0,12}/,
+      cardType: "maestro",
+    },
+    {
+      mask: "0000 0000 0000 0000",
+      regex: /^62\d{0,14}/,
+      cardType: "unionpay",
     },
     {
       mask: "0000 0000 0000 0000",
@@ -96,6 +141,7 @@ function updateSecurityCode(code) {
 
 cardNumberMasked.on("accept", () => {
   const cardType = cardNumberMasked.masked.currentMask.cardType
+  console.log(cardType)
   setCardType(cardType)
   updateCardNumber(cardNumberMasked.value)
 })
